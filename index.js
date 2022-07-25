@@ -20,41 +20,42 @@ const handleResponse = (res, status, message) => {
   res.status(status).send(message);
 };
 
-app.post("/resolveendpoint", (req, res) => {
+app.post("/resolve", (req, res) => {
   const { input } = req.body;
 
-  const rgx = new RegExp(/(\$\([a-z]{4,}:[0-9]\))/g);
-
-  if (typeof input == "string" && rgx.test(input)) {
-    const matches = input.match(rgx);
-    let output = input;
-
-    matches.forEach((match, index) => {
-      const [name, value] = match.split(/[$()]/)[2].split(":");
-
-      fetchTag(name, value)
-        .then((response) => {
-          output = output.replace(match, response.data);
-
-          if (index === matches.length - 1) {
-            return handleResponse(res, 200, output);
-          }
-        })
-        .catch(() => {
-          return handleResponse(
-            res,
-            500,
-            "The server encountered and error, please try again later"
-          );
-        });
-    });
-  } else {
-    return handleResponse(
-      res,
-      400,
-      "Input must be a string and contain at least one tag e.g. 'Hello $(firstname:1)'"
-    );
+  if (typeof input != "string") {
+    return handleResponse(res, 400, "Input must be a string");
   }
+
+  const rgx = new RegExp(/(\$\([a-z]{4,}:[0-9]\))/g);
+  const matches = input.match(rgx);
+
+  if (!matches) return handleResponse(res, 200, input);
+  let output = input;
+  //   console.log(`matches ${matches}`);
+  matches.forEach((match, index) => {
+    // const testi = match.split(/[$()]/);
+
+    const [name, value] = match.split(/[$()]/)[2].split(":");
+
+    fetchTag(name, value)
+      .then((response) => {
+        // console.log(output.replace(match, response.data));
+
+        if (index === matches.length - 1) {
+          console.log("running", index, matches.length, output);
+          return handleResponse(res, 200, output.replace(match, response.data));
+        }
+        output = output.replace(match, response.data);
+      })
+      .catch(() => {
+        return handleResponse(
+          res,
+          500,
+          "The server encountered and error, please try again later"
+        );
+      });
+  });
 });
 
 app.listen(port, () => {

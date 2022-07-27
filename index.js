@@ -31,25 +31,31 @@ app.post("/resolve", (req, res) => {
     );
   }
 
-  const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
-  const matches = input.match(rgx);
-
-  if (!matches) return handleResponse(res, 200, input);
-  let output = input;
-
-  Promise.all(
-    matches.map(async (match) => {
-      const tag = await replaceTag(match);
-      output = output.replace(match, tag);
-    })
-  ).then(() => {
-    return handleResponse(res, 200, output);
-  });
+  resolveTags(input).then((response) => handleResponse(res, 200, response));
 });
 
 app.listen(port, () => {
   console.log(`Template Engine listening on port ${port}`);
 });
+
+const resolveTags = (input) => {
+  return new Promise((resolve) => {
+    const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
+    const matches = input.match(rgx);
+
+    if (!matches) resolve(input);
+    let output = input;
+
+    Promise.all(
+      matches.map(async (match) => {
+        const tag = await replaceTag(match);
+        output = output.replace(match, tag);
+      })
+    ).then(() => {
+      resolve(output);
+    });
+  });
+};
 
 const replaceTag = (match) => {
   return new Promise(async (resolve, reject) => {
@@ -57,7 +63,8 @@ const replaceTag = (match) => {
 
     try {
       const response = await fetchTag(name, value);
-      resolve(response.data);
+      const recursiveCheck = await resolveTags(response.data);
+      resolve(recursiveCheck);
     } catch (err) {
       console.log("Error repacing tag", err);
       reject(err);

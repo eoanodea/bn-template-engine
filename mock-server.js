@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import sampleData from "./sample-data.js";
-// const sampleData = require("./sample-data.json");
+
 dotenv.config();
 
 const app = express();

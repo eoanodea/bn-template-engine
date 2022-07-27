@@ -20,7 +20,7 @@ const handleResponse = (res, status, message) => {
   res.status(status).send(message);
 };
 
-app.post("/resolve", async (req, res) => {
+app.post("/resolve", (req, res) => {
   const { input } = req.body;
 
   if (typeof input != "string") {
@@ -31,7 +31,7 @@ app.post("/resolve", async (req, res) => {
     );
   }
 
-  const rgx = new RegExp(/(\$\([a-z]{4,}:[0-9]\))/g);
+  const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
   const matches = input.match(rgx);
 
   if (!matches) return handleResponse(res, 200, input);

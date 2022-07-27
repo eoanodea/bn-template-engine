@@ -1,7 +1,7 @@
 /**
  * Import primary dependencies
  */
-import express from "express";
+import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 dotenv.config(); // for environment variables
@@ -12,7 +12,7 @@ import { resolveTags } from "./tag-controller.js";
 /**
  * Declare express app
  */
-const app = express();
+const app: Application = express();
 const port = process.env.PORT;
 
 /**
@@ -36,14 +36,14 @@ app.use(cors(corsOptions));
  * @param {*} status
  * @param {*} message
  */
-const handleResponse = (res, status, message) => {
+const handleResponse = (res: Response, status: number, message: string) => {
   res.status(status).send(message);
 };
 
 /**
  * Primary endpoint for server
  */
-app.post("/resolve", (req, res) => {
+app.post("/resolve", (req: Request, res: Response) => {
   const { input } = req.body;
 
   if (typeof input != "string") {
@@ -66,11 +66,6 @@ app
   .listen(port, () => {
     console.log(`Template Engine listening on port ${port}`);
   })
-  .on("error", (err) => {
+  .on("error", (err: Error) => {
     console.error("Server Error: ", err);
-    return handleResponse(
-      res,
-      500,
-      "The server has encountered an error. Please try again later"
-    );
   });

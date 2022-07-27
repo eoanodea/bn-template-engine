@@ -18,5 +18,5 @@ app.get("/template/:type/:id", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Template Engine listening on port ${port}`);
+  console.log(`Mock Server listening on port ${port}`);
 });

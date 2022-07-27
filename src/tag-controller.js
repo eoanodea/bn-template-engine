@@ -1,44 +1,12 @@
-import express from "express";
 import axios from "axios";
-import dotenv from "dotenv";
-import cors from "cors";
-dotenv.config();
 
-const app = express();
-const port = process.env.PORT;
-
-app.use(express.json());
-
-var corsOptions = {
-  origin: process.env.CORS_ORIGIN,
-  optionsSuccessStatus: 200, // For legacy browser support
-};
-
-app.use(cors(corsOptions));
-
-const handleResponse = (res, status, message) => {
-  res.status(status).send(message);
-};
-
-app.post("/resolve", (req, res) => {
-  const { input } = req.body;
-
-  if (typeof input != "string") {
-    return handleResponse(
-      res,
-      400,
-      "Input must be provided and must be a string"
-    );
-  }
-
-  resolveTags(input).then((response) => handleResponse(res, 200, response));
-});
-
-app.listen(port, () => {
-  console.log(`Template Engine listening on port ${port}`);
-});
-
-const resolveTags = (input) => {
+/**
+ * Resolves a input string with any known tags
+ *
+ * @param {String} input
+ * @returns {String} output
+ */
+export const resolveTags = (input) => {
   return new Promise((resolve) => {
     const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
     const matches = input.match(rgx);
@@ -57,6 +25,15 @@ const resolveTags = (input) => {
   });
 };
 
+/**
+ * Takes in a matched string e.g. "$(firstname:1)"
+ * Seperates the name and value and runs the fetchTag function on it
+ *
+ * Also recursively checks the fetchTag response
+ *
+ * @param {String} match
+ * @returns {Promise<String>} Either a string or an error
+ */
 const replaceTag = (match) => {
   return new Promise(async (resolve, reject) => {
     const [name, value] = match.split(/[$()]/)[2].split(":");
@@ -66,12 +43,18 @@ const replaceTag = (match) => {
       const recursiveCheck = await resolveTags(response.data);
       resolve(recursiveCheck);
     } catch (err) {
-      console.log("Error repacing tag", err);
-      reject(err);
+      console.log("Error repacing tag", err.message);
+      resolve("<ERROR>");
     }
   });
 };
 
+/**
+ *
+ * @param {String} name
+ * @param {String} value
+ * @returns {String}
+ */
 const fetchTag = (name, value) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -81,7 +64,7 @@ const fetchTag = (name, value) => {
 
       resolve(response);
     } catch (err) {
-      console.log("Error fetching tag", err);
+      console.log("Error fetching tag", err.message);
       reject(err);
     }
   });

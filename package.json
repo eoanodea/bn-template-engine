@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "mock:dev": "nodemon mock-server.js",
-    "mock:start": "node mock-server.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "mock:dev": "nodemon mock-server/index.js",
+    "mock:start": "node mock-server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eoan O'Dea",

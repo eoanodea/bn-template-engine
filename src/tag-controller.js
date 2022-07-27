@@ -6,7 +6,7 @@ import axios from "axios";
  * @param {String} input
  * @returns {String} output
  */
-export const resolveTags = (input) => {
+export const resolveTags = (input, resolvedTags) => {
   return new Promise((resolve) => {
     const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
     const matches = input.match(rgx);
@@ -16,8 +16,14 @@ export const resolveTags = (input) => {
 
     Promise.all(
       matches.map(async (match) => {
-        const tag = await replaceTag(match);
+        console.log(resolvedTags[match]);
+        if (resolvedTags[match]) {
+          resolve("<CIRCULAR>");
+        }
+        const tag = await replaceTag(match, resolvedTags);
+        resolvedTags[match] = tag;
         output = output.replace(match, tag);
+        console.log("here is output", output);
       })
     ).then(() => {
       resolve(output);
@@ -34,13 +40,14 @@ export const resolveTags = (input) => {
  * @param {String} match
  * @returns {Promise<String>} Either a string or an error
  */
-const replaceTag = (match) => {
+const replaceTag = (match, resolvedTags) => {
   return new Promise(async (resolve, reject) => {
     const [name, value] = match.split(/[$()]/)[2].split(":");
 
     try {
       const response = await fetchTag(name, value);
-      const recursiveCheck = await resolveTags(response.data);
+      const recursiveCheck = await resolveTags(response.data, resolvedTags);
+
       resolve(recursiveCheck);
     } catch (err) {
       console.log("Error repacing tag", err.message);

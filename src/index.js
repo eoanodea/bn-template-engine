@@ -54,8 +54,10 @@ app.post("/resolve", (req, res) => {
       "Input must be provided and must be a string"
     );
   }
-
-  resolveTags(input).then((response) => handleResponse(res, 200, response));
+  let resolvedTags = {};
+  resolveTags(input, resolvedTags).then((response) =>
+    handleResponse(res, 200, response)
+  );
 });
 
 /**

@@ -7,4 +7,6 @@ export default {
     "$(firstname:1) $(lastname:1)",
     "$(firstname:2) $(lastname:2)",
   ],
+  parent: ["$(firstname:0), parent of $(child:0)"],
+  child: ["$(firstname:1), child of $(parent:0)"],
 };

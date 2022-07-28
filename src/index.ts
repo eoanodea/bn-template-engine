@@ -1,18 +1,18 @@
 /**
  * Import primary dependencies
  */
-import express from "express";
+import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 dotenv.config(); // for environment variables
 
 // Resolve tags module
-import { resolveTags } from "./tag-controller.js";
+import { resolveTags } from "./tag-controller";
 
 /**
  * Declare express app
  */
-const app = express();
+const app: Application = express();
 const port = process.env.PORT;
 
 /**
@@ -23,7 +23,7 @@ app.use(express.json());
 /**
  * Enable and configure CORS
  */
-var corsOptions = {
+const corsOptions = {
   origin: process.env.CORS_ORIGIN,
   optionsSuccessStatus: 200, // For legacy browser support
 };
@@ -36,17 +36,17 @@ app.use(cors(corsOptions));
  * @param {*} status
  * @param {*} message
  */
-const handleResponse = (res, status, message) => {
+const handleResponse = (res: Response, status: number, message: string) => {
   res.status(status).send(message);
 };
 
 /**
  * Primary endpoint for server
  */
-app.post("/resolve", (req, res) => {
+app.post("/resolve", (req: Request, res: Response) => {
   const { input } = req.body;
 
-  if (typeof input != "string") {
+  if (typeof input !== "string") {
     // input validation
     return handleResponse(
       res,
@@ -54,7 +54,7 @@ app.post("/resolve", (req, res) => {
       "Input must be provided and must be a string"
     );
   }
-  let resolvedTags = {};
+  const resolvedTags = {};
   resolveTags(input, resolvedTags).then((response) =>
     handleResponse(res, 200, response)
   );
@@ -68,11 +68,6 @@ app
   .listen(port, () => {
     console.log(`Template Engine listening on port ${port}`);
   })
-  .on("error", (err) => {
+  .on("error", (err: Error) => {
     console.error("Server Error: ", err);
-    return handleResponse(
-      res,
-      500,
-      "The server has encountered an error. Please try again later"
-    );
   });

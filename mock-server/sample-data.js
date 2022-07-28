@@ -7,4 +7,6 @@ module.exports = {
     "$(firstname:1) $(lastname:1)",
     "$(firstname:2) $(lastname:2)",
   ],
+  parent: ["Cara, parent of $(child:0)"],
+  child: ["John, child of $(parent:0)"],
 };

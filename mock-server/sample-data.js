@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   firstname: ["John", "Conor", "Jesus"],
   lastname: ["Dunne", "Pancake", "Wakawombo"],
   email: ["j@j.ie", "pancake@yeehaw.com", "something@hey.ie"],

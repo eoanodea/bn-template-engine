@@ -43,8 +43,7 @@ const replaceTag = (match: string): Promise<string> => {
       const recursiveCheck = await resolveTags(response);
       resolve(recursiveCheck);
     } catch (err) {
-      console.log("Error repacing tag", err.message);
-      resolve("<ERROR>");
+      resolve(err);
     }
   });
 };

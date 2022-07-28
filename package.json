@@ -2,8 +2,7 @@
   "name": "template-engine",
   "version": "1.0.0",
   "description": "A simple web service that can be used as a templating engine",
-  "main": "index.js",
-  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",

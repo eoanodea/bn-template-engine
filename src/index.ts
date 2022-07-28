@@ -7,7 +7,7 @@ import cors from "cors";
 dotenv.config(); // for environment variables
 
 // Resolve tags module
-import { resolveTags } from "./tag-controller.js";
+import { resolveTags } from "./tag-controller";
 
 /**
  * Declare express app
@@ -23,7 +23,7 @@ app.use(express.json());
 /**
  * Enable and configure CORS
  */
-var corsOptions = {
+const corsOptions = {
   origin: process.env.CORS_ORIGIN,
   optionsSuccessStatus: 200, // For legacy browser support
 };
@@ -46,7 +46,7 @@ const handleResponse = (res: Response, status: number, message: string) => {
 app.post("/resolve", (req: Request, res: Response) => {
   const { input } = req.body;
 
-  if (typeof input != "string") {
+  if (typeof input !== "string") {
     // input validation
     return handleResponse(
       res,

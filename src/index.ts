@@ -6,7 +6,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 dotenv.config(); // for environment variables
 
-// Resolve tags module
+/**
+ * Resolve tags module
+ */
 import { resolveTags } from "./tag-controller";
 
 /**
@@ -30,11 +32,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 /**
- * Used to keep all server responses consistent
+ * Just used to keep all server responses consistent
+ * and keep our code nice & tidy
  *
- * @param {*} res
- * @param {*} status
- * @param {*} message
+ * @param {Response} res
+ * @param {number} status
+ * @param {string} message
  */
 const handleResponse = (res: Response, status: number, message: string) => {
   res.status(status).send(message);

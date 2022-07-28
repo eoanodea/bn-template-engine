@@ -57,7 +57,7 @@ app.post("/resolve", (req: Request, res: Response) => {
       "Input must be provided and must be a string"
     );
   }
-  const resolvedTags = {};
+  const resolvedTags = new Set<string>();
   resolveTags(input, resolvedTags).then((response) =>
     handleResponse(res, 200, response)
   );

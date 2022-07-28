@@ -1,15 +1,8 @@
 import { Request } from "express";
 
 /**
- * Extending Request to contain middleware
+ * Extending Request to an input string in the body
  */
 export default interface RequestMiddleware extends Request {
   body: { input: string };
-}
-
-/**
- * Used to keep track of already resolved tags
- */
-export interface ResolvedTags {
-  [key: string]: number;
 }

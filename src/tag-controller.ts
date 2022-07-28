@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ResolvedTags } from "./interfaces";
 
 /**
  * Resolves a input string with any known tags
@@ -7,31 +6,30 @@ import { ResolvedTags } from "./interfaces";
  * @param {string} input
  * @returns {string} The resulting output string
  */
-export const resolveTags = (
+export const resolveTags = async (
   input: string,
-  resolvedTags: ResolvedTags
+  resolvedTags: Set<string>
 ): Promise<string> => {
-  return new Promise((resolve) => {
-    // Some complicated regex expression that basically searches for tags with any integer
-    const rgx = new RegExp(/(\$\([a-z]{2,}:-?[0-9]\d*(\.\d+)?\))/g);
+  // Some complicated regex expression that basically searches for tags with any integer
+  const rgx = new RegExp(/(\$\([a-z]{2,}:-?[0-9]\d*(\.\d+)?\))/g);
 
-    // Check for matches in the input
-    const matches = input.match(rgx);
+  // Check for matches in the input
+  const matches = input.match(rgx);
 
-    // If there's nothing then we're done here, resolve the input
-    if (!matches) return resolve(input);
-    let output = input;
+  // If there's nothing then we're done here, resolve the input
+  if (!matches) return input;
+  let output = input;
 
-    // Loop through each match, and recursively resolve any tags
-    Promise.all(
-      matches.map(async (match) => {
-        const tag = await replaceTag(match, resolvedTags);
-        output = output.replace(match, tag);
-      })
-    ).then(() => {
-      // Once all of our async business is done we can resolve the output back to the main
-      resolve(output);
-    });
+  // Loop through each match, and recursively resolve any tags
+  return Promise.all(
+    matches.map(async (match) => {
+      const tag = await replaceTag(match, new Set(resolvedTags));
+
+      output = output.replace(match, tag);
+    })
+  ).then(() => {
+    // Once all of our async business is done we can resolve the output back to the main
+    return output;
   });
 };
 
@@ -46,7 +44,7 @@ export const resolveTags = (
  */
 const replaceTag = (
   match: string,
-  resolvedTags: ResolvedTags
+  resolvedTags: Set<string>
 ): Promise<string> => {
   return new Promise(async (resolve) => {
     const [name, value] = match.split(/[$()]/)[2].split(":"); // Splits something like $(firstname:0) to ["fisrtname", "0"]
@@ -58,13 +56,13 @@ const replaceTag = (
        * If we've checked for this tag before,
        * resolve <CIRCULAR> to avoid infinite loops
        */
-      if (resolvedTags[match] === 0) {
+      if (resolvedTags.has(match)) {
         resolve("<CIRCULAR>");
         return;
       }
 
       // If not, mark it as the first time we've resolved this tag
-      resolvedTags[match] = 0;
+      resolvedTags.add(match);
 
       const recursiveCheck = await resolveTags(response, resolvedTags);
 

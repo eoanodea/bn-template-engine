@@ -12,7 +12,8 @@ export const resolveTags = (
   resolvedTags: ResolvedTags
 ): Promise<string> => {
   return new Promise((resolve) => {
-    const rgx = new RegExp(/(\$\([a-z]{2,}:[0-9]\))/g);
+    const rgx = new RegExp(/(\$\([a-z]{2,}:-?[0-9]\d*(\.\d+)?\))/g);
+
     const matches = input.match(rgx);
 
     if (!matches) resolve(input);
@@ -20,14 +21,8 @@ export const resolveTags = (
 
     Promise.all(
       matches.map(async (match) => {
-        console.log(resolvedTags[match]);
-        if (resolvedTags[match]) {
-          resolve("<CIRCULAR>");
-        }
         const tag = await replaceTag(match, resolvedTags);
-        resolvedTags[match] = tag;
         output = output.replace(match, tag);
-        console.log("here is output", output);
       })
     ).then(() => {
       resolve(output);
@@ -37,7 +32,7 @@ export const resolveTags = (
 
 /**
  * Takes in a matched string e.g. "$(firstname:1)"
- * Seperates the name and value and runs the fetchTag function on it
+ * Seperates the name and value e.g. ["firstname", "1"] and runs the fetchTag function on it
  *
  * Also recursively checks the fetchTag response
  *
@@ -53,6 +48,14 @@ const replaceTag = (
 
     try {
       const response = await fetchTag(name, value);
+
+      if (resolvedTags[match] === 0) {
+        resolve("<CIRCULAR>");
+        return;
+      }
+
+      resolvedTags[match] = 0;
+
       const recursiveCheck = await resolveTags(response, resolvedTags);
 
       resolve(recursiveCheck);

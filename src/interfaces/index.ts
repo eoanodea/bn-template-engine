@@ -11,5 +11,5 @@ export default interface RequestMiddleware extends Request {
  * Used to keep track of already resolved tags
  */
 export interface ResolvedTags {
-  [key: string]: string;
+  [key: string]: number;
 }
